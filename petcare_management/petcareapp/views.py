@@ -6,9 +6,9 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer
 from rest_framework.permissions import IsAuthenticated
-from .models import District, DistrictSelection, PetHostel
-from .serializers import DistrictSerializer ,DistrictSelectionSerializer,PetHostelSerializer
-
+from .models import District, DistrictSelection, PetHostel,PetHospital,PetSupplies,PetCategory, Doctor, Appointment
+from .serializers import DistrictSerializer , PetCategorySerializer, DoctorSerializer, AppointmentSerializer ,DistrictSelectionSerializer,PetHostelSerializer,PetSuppliesSerializer,PetHospitalSerializer
+from rest_framework import generics
 
 
 class RegisterView(APIView):
@@ -62,3 +62,38 @@ def hostels_by_district(request, district_id):
         return Response(serializer.data)
     except:
         return Response({'error': 'Error retrieving hostels'}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def hospitals_by_district(request, district_id):
+    try:
+        hospitals = PetHospital.objects.filter(district_id=district_id)
+        serializer = PetHospitalSerializer(hospitals, many=True, context={'request': request})
+        return Response(serializer.data)
+    except:
+        return Response({'error': 'Error retrieving hospitals'}, status=status.HTTP_400_BAD_REQUEST)    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def supplies_by_district(request, district_id):
+    try:
+        supplies = PetSupplies.objects.filter(district_id=district_id)
+        serializer = PetSuppliesSerializer(supplies, many=True, context={'request': request})
+        return Response(serializer.data)
+    except:
+        return Response({'error': 'Error retrieving supplies'}, status=status.HTTP_400_BAD_REQUEST)    
+
+
+class PetCategoryListView(generics.ListAPIView):
+    queryset = PetCategory.objects.all()
+    serializer_class = PetCategorySerializer
+
+class DoctorListView(generics.ListAPIView):
+    queryset = Doctor.objects.all()
+    serializer_class = DoctorSerializer
+
+class AppointmentCreateView(generics.CreateAPIView):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer    
