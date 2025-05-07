@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import District, DistrictSelection,PetHostel
+from .models import District, DistrictSelection,PetHostel,PetHospital,PetSupplies,PetCategory, Doctor, Appointment
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -39,3 +39,42 @@ class PetHostelSerializer(serializers.ModelSerializer):
         if obj.image and hasattr(obj.image, 'url'):
             return request.build_absolute_uri(obj.image.url)
         return None
+    
+class PetHospitalSerializer(serializers.ModelSerializer):
+    district = DistrictSerializer(read_only=True)
+    image = serializers.ImageField(use_url=True)
+    class Meta:
+        model = PetHospital
+        fields = ['id', 'name', 'address', 'contact', 'district', 'image']
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            return request.build_absolute_uri(obj.image.url)
+        return None 
+       
+class PetSuppliesSerializer(serializers.ModelSerializer):
+    district = DistrictSerializer(read_only=True)
+    image = serializers.ImageField(use_url=True)
+    class Meta:
+        model = PetSupplies
+        fields = ['id', 'name', 'address', 'contact', 'district', 'image']
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            return request.build_absolute_uri(obj.image.url)
+        return None    
+    
+class PetCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PetCategory
+        fields = '__all__'
+
+class DoctorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = '__all__'
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = '__all__'    
